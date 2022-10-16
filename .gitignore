@@ -9,3 +9,11 @@ target/debug/.fingerprint/compiler_builtins-87328d70ffce7005/build-script-build-
 target/debug/.fingerprint/compiler_builtins-87328d70ffce7005/build-script-build-script-build.json
 target/debug/.fingerprint/compiler_builtins-87328d70ffce7005/dep-build-script-build-script-build
 target/debug/.fingerprint/compiler_builtins-87328d70ffce7005/invoked.timestamp
+outcrates/limine-rs/
+target/debug/build/compiler_builtins-87328d70ffce7005/build-script-build.exe
+target/debug/build/compiler_builtins-87328d70ffce7005/build_script_build-87328d70ffce7005.d
+target/debug/build/compiler_builtins-87328d70ffce7005/build_script_build-87328d70ffce7005.exe
+target/debug/build/compiler_builtins-87328d70ffce7005/build_script_build-87328d70ffce7005.pdb
+target/debug/build/compiler_builtins-87328d70ffce7005/build_script_build.pdb
+target/x86_64/CACHEDIR.TAG
+target/x86_64/debug/.cargo-lock
