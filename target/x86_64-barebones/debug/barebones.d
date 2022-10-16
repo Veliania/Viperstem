@@ -1,0 +1,1 @@
+C:\Users\17707\Documents\CompSci\Viper\Viperstem-OS\rust\viperstem-limine\target\x86_64-barebones\debug\barebones: C:\Users\17707\Documents\CompSci\Viper\Viperstem-OS\rust\crates\limine-rs\src\lib.rs C:\Users\17707\Documents\CompSci\Viper\Viperstem-OS\rust\viperstem-limine\src\main.rs C:\Users\17707\Documents\CompSci\Viper\Viperstem-OS\rust\viperstem-limine\src\writer.rs
