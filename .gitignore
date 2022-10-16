@@ -1,5 +1,11 @@
-./target
 ./Cargo.lock
 ./outcrates/limine/
 ./limine/
 limine/
+target/CACHEDIR.TAG
+target/.rustc_info.json
+target/debug/.cargo-lock
+target/debug/.fingerprint/compiler_builtins-87328d70ffce7005/build-script-build-script-build
+target/debug/.fingerprint/compiler_builtins-87328d70ffce7005/build-script-build-script-build.json
+target/debug/.fingerprint/compiler_builtins-87328d70ffce7005/dep-build-script-build-script-build
+target/debug/.fingerprint/compiler_builtins-87328d70ffce7005/invoked.timestamp

@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-limine = { path = "../crates/limine-rs" }
+limine = { path = "./outcrates/limine-rs" }
 raw-cpuid = "10.2.0"
