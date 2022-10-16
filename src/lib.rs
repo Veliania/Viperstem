@@ -9,7 +9,7 @@ pub use limine::*;
 
 pub static TERMINAL_REQUEST: LimineTerminalRequest = LimineTerminalRequest::new(0);
 pub static BOOTLOADER_INFO: LimineBootInfoRequest = LimineBootInfoRequest::new(0);
-pub static MMAP: LimineMemmapRequest = LimineMemmapRequest::new(0);
+pub static MMAP: LimineMmapRequest = LimineMmapRequest::new(0);
 
 pub fn init() {
     cpu::init();

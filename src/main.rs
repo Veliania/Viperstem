@@ -23,7 +23,7 @@ extern "C" fn x86_64_barebones_main() -> ! {
         .get_response()
         .get()
         .expect("barebones: recieved no mmap")
-        .memmap();
+        .mmap();
 
     //println!("mmap: {:#x?}", mmap);
 
