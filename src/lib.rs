@@ -1,23 +1,35 @@
+#![feature(abi_x86_interrupt, core_intrinsics)]
 #![no_std]
 
 pub mod output;
-pub mod interrupts;
 pub mod cpu;
 pub mod panic;
+pub mod descriptors;
+pub mod execution;
 
 pub use limine::*;
 
 pub static TERMINAL_REQUEST: LimineTerminalRequest = LimineTerminalRequest::new(0);
 pub static BOOTLOADER_INFO: LimineBootInfoRequest = LimineBootInfoRequest::new(0);
-pub static MMAP: LimineMmapRequest = LimineMmapRequest::new(0);
+pub static MMAP: LimineMemmapRequest = LimineMemmapRequest::new(0);
+pub static LVL5: Limine5LevelPagingRequest = Limine5LevelPagingRequest::new(0);
 
 pub fn init() {
+    println!("Initializing CPU aspects");
     cpu::init();
-    interrupts::init();
+    println!("CPU aspects initialized");
+    println!("Initializing GDT aspects");
+    descriptors::init();
+    println!("GDT aspects initialized");
 }
-
 
 #[macro_export]
 macro_rules! panic {
     ($($arg:tt)*) => ($crate::panic::panic(format_args!($($arg)*), ));
+}
+
+pub fn hlt_loop() -> ! {
+    loop {
+        unsafe { core::arch::asm!("hlt"); }
+    }
 }

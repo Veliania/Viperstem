@@ -1,9 +1,10 @@
 use core::panic::PanicInfo;
 
-use crate::{ println, print };
+use crate::{ print };
 
 #[panic_handler]
 pub fn panic(info: &PanicInfo) -> ! {
-    println!("Error: panic: {:#?}", info);
+    print!("Error: panic: {:#?}", info);
+    //print!("panicked");
     loop {}
 }
