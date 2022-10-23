@@ -20,7 +20,17 @@ pub fn init() {
     println!("CPU aspects initialized");
     println!("Initializing GDT aspects");
     descriptors::init();
-    println!("GDT aspects initialized");
+    //println!("GDT aspects initialized"); //running this causes errors for the system
+}
+
+static mut thingy: Option<i32> = None;
+
+pub fn do_smth() {
+    let a = 10+10;
+    let b = a + a;
+    let c = b + b;
+
+    unsafe {thingy = Some(c);}
 }
 
 #[macro_export]

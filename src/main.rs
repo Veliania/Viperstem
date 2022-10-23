@@ -34,9 +34,10 @@ extern "C" fn x86_64_barebones_main() -> ! {
         None => println!("level 5 paging not available, using level 4"),
     }
 
-    kern_push(init);
+    kern_push(init); //push the initialization function into the kernel execution loop to demonstrate it
+    kern_push(do_smth); //testing to see if a GP fault is thrown
 
     loop {
-        kern_exec();
+        kern_exec(); // begin going through the kernel execution loop
     }
 }
