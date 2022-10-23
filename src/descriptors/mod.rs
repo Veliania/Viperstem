@@ -65,6 +65,10 @@ static mut DEFAULT_DESC_REG: DescriptorTableRegister = DescriptorTableRegister {
     offset: 0,
 };
 
+extern "C" {
+    fn load();
+}
+
 pub fn init() {
     unsafe {
         DEFAULT_DESCRIPTOR = GDT { 
@@ -80,13 +84,20 @@ pub fn init() {
             offset: (&mut DEFAULT_DESCRIPTOR as *mut GDT) as u64
         };
 
-        x86_64::instructions::interrupts::disable();
-
-        core::arch::asm!(
+        //original code to load GDT
+        /*core::arch::asm!(
             "lgdt [{gdtr}]",
+            //"retfq",
+            gdtr = in(reg) (&mut DEFAULT_DESC_REG as *mut DescriptorTableRegister) as u64
+        );*/
+
+        //calling the new code
+        core::arch::asm!(
+            "mov rdi, {gdtr}",
+            //"retfq",
             gdtr = in(reg) (&mut DEFAULT_DESC_REG as *mut DescriptorTableRegister) as u64
         );
 
-        x86_64::instructions::interrupts::enable();
+        load();
     }
 }

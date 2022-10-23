@@ -11,11 +11,11 @@ extern "C" fn x86_64_barebones_main() -> ! {
         .get()
         .expect("barebones: recieved no bootloader info");
 
-    println!(
+    /*println!(
         "bootloader: (name={:?}, version={:?})",
         bootloader_info.name.to_str().unwrap(),
         bootloader_info.version.to_str().unwrap()
-    );
+    );*/
 
     //let mmap = MMAP
         //.get_response()
@@ -29,10 +29,10 @@ extern "C" fn x86_64_barebones_main() -> ! {
 
     use viperstem::execution::*;
 
-    match lvl5 {
-        Some(_version) => println!("level 5 paging available, using"),
-        None => println!("level 5 paging not available, using level 4"),
-    }
+    //match lvl5 {
+        //Some(_version) => println!("level 5 paging available, using"),
+        //None => println!("level 5 paging not available, using level 4"),
+    //}
 
     kern_push(init); //push the initialization function into the kernel execution loop to demonstrate it
     kern_push(do_smth); //testing to see if a GP fault is thrown

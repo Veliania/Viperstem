@@ -9,17 +9,20 @@ pub mod execution;
 
 pub use limine::*;
 
+//pub static TERMINAL_REQUEST: LimineTerminalRequest = LimineTerminalRequest::new(0);
 pub static TERMINAL_REQUEST: LimineTerminalRequest = LimineTerminalRequest::new(0);
 pub static BOOTLOADER_INFO: LimineBootInfoRequest = LimineBootInfoRequest::new(0);
 pub static MMAP: LimineMemmapRequest = LimineMemmapRequest::new(0);
 pub static LVL5: Limine5LevelPagingRequest = Limine5LevelPagingRequest::new(0);
 
 pub fn init() {
-    println!("Initializing CPU aspects");
+    //println!("Initializing CPU aspects");
     cpu::init();
-    println!("CPU aspects initialized");
-    println!("Initializing GDT aspects");
+    //println!("CPU aspects initialized");
+    //println!("Initializing GDT aspects");
+    x86_64::instructions::interrupts::disable();
     descriptors::init();
+    x86_64::instructions::interrupts::enable();
     //println!("GDT aspects initialized"); //running this causes errors for the system
 }
 

@@ -2,6 +2,7 @@
 name = "viperstem"
 version = "0.1.0"
 edition = "2021"
+builder = "./build.rs"
 
 [dependencies]
 limine = "0.1.9"

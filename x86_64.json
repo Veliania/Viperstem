@@ -16,7 +16,8 @@
     "pre-link-args": {
         "ld.lld": [
             "--gc-sections",
-            "--script=.cargo/kernel.ld"
+            "--script=.cargo/kernel.ld",
+            "./objects/gdt.o"
         ]
     }
 }
