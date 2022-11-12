@@ -1,2 +1,2 @@
-pub mod writer;
-pub use writer::*;
+pub mod terminal;
+pub use terminal::*;
