@@ -1,16 +1,15 @@
 use core::intrinsics::size_of;
 
-use x86_64::{structures::paging::{PageTable, PageTableFlags, PhysFrame, page_table::PageTableEntry, Page, page}, PhysAddr, registers::control::*};
-use crate::{*, output::FRAME_REQUEST, bitmap::BitMap};
+use x86_64::{structures::paging::{PageTable, PageTableFlags, PhysFrame, page_table::PageTableEntry}, PhysAddr, registers::control::*};
+use crate::*;
 
 static mut _PAGE_FRAME: Option<u64> = None;
 static mut PML4: PageTable = PageTable::new();
-static mut is_used_bitmap: [u8; 32_768] = [0; 32_768];
 
 pub fn paging() {
-    let new_page_frame = req_sect_size(258 * size_of::<PageTable>());
+    let new_page_frame = req_sect_size(3 * size_of::<PageTable>());
 
-    println!("requested size: {}", 4 * size_of::<PageTable>());
+    println!("requested size: {}", 3 * size_of::<PageTable>());
 
     println!("page frame: {:?}\nsize: {}", new_page_frame.0.base, new_page_frame.0.size);
 
@@ -20,23 +19,19 @@ pub fn paging() {
         let current_flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
 
         let PDP_ptr = base_addr;
-        *PDP_ptr = PageTable::new();
+        core::ptr::write(PDP_ptr, PageTable::new());
+        println!("PD pointer: {:?}", PDP_ptr);
 
         let PD_ptr = base_addr.offset(size_of::<PageTable>() as isize);
-        *PD_ptr = PageTable::new();
+        core::ptr::write(PD_ptr, PageTable::new());
+        println!("PD pointer: {:?}", PD_ptr);
 
-        let PT_ptr = base_addr.offset(2 * size_of::<PageTable>() as isize) as *mut [PageTable; 256];
-        for mut entry in (*PT_ptr).iter_mut() {
-            entry = &mut PageTable::new();
-        }
+        let PT_ptr = base_addr.offset(2 * size_of::<PageTable>() as isize);
+        core::ptr::write(PT_ptr, PageTable::new());
+        println!("PT pointer: {:?}", PT_ptr);
 
-        let old_pml4 = Cr3::read().0.start_address().as_u64() as *mut PageTable;
 
-        println!("Getting frame buffer virt addr");
-        //let framebuffer_virt = VirtAddr::new_truncate(FRAME_REQUEST.get_response().get().unwrap().framebuffers()[0].address.as_ptr().unwrap() as u64);
-        //let framebuffer_addr = virt_to_phys(framebuffer_virt, old_pml4).expect("Could not find virtual address in page map");
-
-        
+        println!("Getting frame buffer virt addr");        
         let mut wrapped_framebuffer_addr: Option<PhysAddr> = None;
         for entry in MMAP.get_response().get().unwrap().memmap() {
             match entry.typ {
@@ -48,6 +43,7 @@ pub fn paging() {
             }
         }
 
+
         let framebuffer_addr = match wrapped_framebuffer_addr {
             Some(val) => val,
             None => panic!("Could not find framebuffer")
@@ -55,19 +51,15 @@ pub fn paging() {
 
         PML4[0].set_addr(PhysAddr::new_truncate(PDP_ptr as u64), current_flags);
         (*PDP_ptr)[0].set_addr(PhysAddr::new_truncate(PD_ptr as u64), current_flags);
-        //(*PD_ptr)[0].set_addr(PhysAddr::new_truncate(PT_ptr as u64), current_flags);
-        for i in 0..256 {
-            (*PD_ptr)[i].set_addr(PhysAddr::new_truncate((&mut (*PT_ptr)) as *mut PageTable as u64), current_flags);
-        }
+        (*PD_ptr)[0].set_addr(PhysAddr::new_truncate(PT_ptr as u64), current_flags);
 
+        println!("Mapping frame buffer");
+        let frameflags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE;
+        map_section(framebuffer_addr, VirtAddr::new_truncate(0), frameflags);
 
         let flags = Cr3::read().1;
         let frame = PhysFrame::from_start_address(PhysAddr::new_truncate((&mut PML4 as *mut PageTable) as u64)).expect("Page map level 4 could not be loaded as a physframe");
         Cr3::write(frame, flags);
-        
-        println!("Mapping frame buffer");
-        let frameflags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE;
-        map_section(framebuffer_addr, VirtAddr::new_truncate(0), frameflags);
         
         output::init_post_paging(VirtAddr::new_truncate(0)); //MUST RUN IMMEDIATELY AFTER PAGING, OTHERWISE OUTPUT WONT WORK
     }
@@ -79,12 +71,39 @@ pub unsafe fn map_section(addr: PhysAddr, virt_addr: VirtAddr, flags: PageTableF
     let pd_entry_bits = (virt_addr.as_u64() >> 21) & 0b111111111;
     let pt_entry_bits = (virt_addr.as_u64() >> 12) & 0b111111111;
 
-    let pdp = PML4[pml4_entry_bits as usize].addr().as_u64() as *mut PageTable;
-    let pd = (*pdp)[pdp_entry_bits as usize].addr().as_u64() as *mut PageTable;
-    let pt = (*pd)[pd_entry_bits as usize].addr().as_u64() as *mut PageTable;
+    assert!((&mut PML4 as *mut PageTable) != 0 as *mut PageTable, "PML4 pointer was null");
     
+    let pdp = PML4[pml4_entry_bits as usize].addr().as_u64() as *mut PageTable;
+    assert!(PML4[pml4_entry_bits as usize].flags() & PageTableFlags::PRESENT == PageTableFlags::PRESENT, "No present entry at {} in PML4", pml4_entry_bits);
+    assert!(pdp != 0 as *mut PageTable, "PDP pointer was null, {:?}", pdp);
+    println!("PDP pointer: {:?}", pdp);
+
+    let pd = (*pdp)[pdp_entry_bits as usize].addr().as_u64() as *mut PageTable;
+    assert!((*pdp)[pdp_entry_bits as usize].flags() & PageTableFlags::PRESENT == PageTableFlags::PRESENT, "No present entry at {} in PDP", pdp_entry_bits);
+    assert!(pd != 0 as *mut PageTable, "PD pointer was null, {:?}", pd);
+    println!("PD pointer: {:?}", pd);
+
+    let pt = (*pd)[pd_entry_bits as usize].addr().as_u64() as *mut PageTable;
+    println!("PT pointer: {:?}", pt);
+    println!("PD[{}]: {:?}", pd_entry_bits, (*pd)[pd_entry_bits as usize].addr().as_u64() as *mut PageTable);
+
+    hlt_loop(); //here to allow me to debug since otherwise it will fail the assertions
+    assert!((*pd)[pd_entry_bits as usize].flags() & PageTableFlags::PRESENT == PageTableFlags::PRESENT, "No present entry at {} in PD", pd_entry_bits);
+    assert!((*pt)[pt_entry_bits as usize].flags() & PageTableFlags::PRESENT == PageTableFlags::PRESENT, "No present entry at {} in PT", pt_entry_bits);
+    assert!(pt != 0 as *mut PageTable, "PT pointer was null, {:?} entry number in pd: {}", pt, pd_entry_bits);
+    
+    let full_flags = flags | PageTableFlags::PRESENT;
+
+    println!("Mapping 0x{:x} to 0x{:x}", addr.as_u64(), virt_addr.as_u64());
+
+    let mut page_test_entry = PageTableEntry::new();
+    page_test_entry.set_addr(addr, full_flags);
+
+    println!("{:#?}", page_test_entry);
+
     println!("Setting address for page");
-    (*pt)[pt_entry_bits as usize].set_addr(addr, flags);
+    (*pt).iter_mut().nth(pt_entry_bits as usize).expect("Could not find entry").set_addr(addr, full_flags);
+    //(*pt)[pt_entry_bits as usize].set_addr(addr, flags);
     println!("Address for page set");
 }
 

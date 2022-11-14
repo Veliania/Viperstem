@@ -58,7 +58,7 @@ extern "x86-interrupt" fn page_fault_handler(
 ) {
     use x86_64::registers::control::Cr2;
 
-    //crate::output::set_colors(0xFF0000, 0xFFFFFFFF);
+    crate::output::set_colors(0xFF0000, 0xFFFFFFFF);
     println!("EXCEPTION: PAGE FAULT");
     println!("Accessed Address: {:?}", Cr2::read());
     println!("Error Code: {:?}", error_code);
@@ -68,13 +68,21 @@ extern "x86-interrupt" fn page_fault_handler(
 
 extern "x86-interrupt" fn double_fault_handler(
     stack_frame: InterruptStackFrame,
-    _error_code: u64,
+    error_code: u64,
 ) -> ! {
-    panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
+    let mut output: u64 = 0;
+    unsafe {
+        core::arch::asm!(
+            "mov {out}, rax",
+            out = inout(reg) output
+        );
+    }
+    
+    panic!("EXCEPTION: DOUBLE FAULT\nError Code: {:?}\n{:#?}\nRAX contents: {}", error_code, stack_frame, output);
 }
 
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
-    print!(".");
+    //print!(".");
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
@@ -85,8 +93,6 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
     use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet1};
     use spin::Mutex;
     use x86_64::instructions::port::Port;
-
-    println!("Keyboard");
 
     lazy_static! {
         static ref KEYBOARD: Mutex<Keyboard<layouts::Us104Key, ScancodeSet1>> = Mutex::new(
