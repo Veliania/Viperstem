@@ -2,8 +2,7 @@
 #![recursion_limit = "256"]
 #![feature(custom_test_frameworks)]
 #![feature(alloc_error_handler)]
-//#![feature(alloc_layout_extra)]
-//#![feature(type_alias_impl_trait)]
+#![feature(pointer_byte_offsets)]
 #![feature(abi_x86_interrupt, core_intrinsics)]
 #![no_std]
 

@@ -22,11 +22,11 @@ pub fn paging() {
         core::ptr::write(PDP_ptr, PageTable::new());
         println!("PD pointer: {:?}", PDP_ptr);
 
-        let PD_ptr = base_addr.offset(size_of::<PageTable>() as isize);
+        let PD_ptr = base_addr.offset(1);
         core::ptr::write(PD_ptr, PageTable::new());
         println!("PD pointer: {:?}", PD_ptr);
 
-        let PT_ptr = base_addr.offset(2 * size_of::<PageTable>() as isize);
+        let PT_ptr = base_addr.offset(2);
         core::ptr::write(PT_ptr, PageTable::new());
         println!("PT pointer: {:?}", PT_ptr);
 

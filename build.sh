@@ -5,7 +5,7 @@ make -C limine
 # 2. build the iso file
 rm -rf iso_root
 mkdir -p iso_root
-cp target/x86_64/debug/viperstem limine.cfg limine/limine.sys limine/limine-cd.bin limine/limine-cd-efi.bin iso_root/
+cp target/x86_64-unknown-none/debug/viperstem limine.cfg limine/limine.sys limine/limine-cd.bin limine/limine-cd-efi.bin iso_root/
 xorriso -as mkisofs -b limine-cd.bin \
     -no-emul-boot -boot-load-size 4 -boot-info-table \
     --efi-boot limine-cd-efi.bin \
