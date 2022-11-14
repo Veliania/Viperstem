@@ -8,7 +8,7 @@ use viperstem::{ *, bitmap::BitMap, memory::sect_alloc::{ sect_count, space, sec
 
 // define the kernel's entry point function
 #[no_mangle]
-extern "C" fn x86_64_barebones_main() -> ! {
+extern "C" fn kernel_main() -> ! {
     init();
 
     let bootloader_info = BOOTLOADER_INFO
