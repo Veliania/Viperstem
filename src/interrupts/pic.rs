@@ -13,6 +13,7 @@ pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 pub enum InterruptIndex {
     Timer = PIC_1_OFFSET,
     Keyboard,
+    Debug = 42,
 }
 
 impl InterruptIndex {
@@ -40,6 +41,7 @@ lazy_static! {
         //}
         idt[InterruptIndex::Timer.as_usize()].set_handler_fn(timer_interrupt_handler);
         idt[InterruptIndex::Keyboard.as_usize()].set_handler_fn(keyboard_interrupt_handler);
+        idt[InterruptIndex::Debug.as_usize()].set_handler_fn(debug_handler);
         idt
     };
 }
@@ -50,6 +52,13 @@ pub fn init_idt() {
 
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
     println!("EXCEPTION: BREAKPOINT\n{:#?}", stack_frame);
+}
+
+extern "x86-interrupt" fn debug_handler(_stack_frame: InterruptStackFrame) {
+    unsafe {
+        PICS.lock()
+            .notify_end_of_interrupt(InterruptIndex::Debug.as_u8());
+    }
 }
 
 extern "x86-interrupt" fn page_fault_handler(

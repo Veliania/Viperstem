@@ -54,7 +54,8 @@ pub fn paging() {
 
         let framebuffer_addr = match wrapped_framebuffer_addr {
             Some(val) => val,
-            None => panic!("Could not find framebuffer")
+            //None => panic!("Could not find framebuffer")
+            None => PhysAddr::new(output::ADDRESS.lock().unwrap().as_u64())
         };
 
         PML4[511].set_addr(PhysAddr::new_truncate(PDP_ptr as u64), current_flags);

@@ -21,6 +21,7 @@ extern "C" fn kernel_main() -> ! {
         bootloader_info.name.to_str().unwrap(),
         bootloader_info.version.to_str().unwrap()
     );
+    int_debug();
 
     /*let mmap = MMAP
         .get_response()
@@ -40,6 +41,7 @@ extern "C" fn kernel_main() -> ! {
     let mut executor = task::executor::Executor::new();
 
     executor.spawn(task::Task::new(_tests()));
+    int_debug();
 
     executor.run();
 }
@@ -75,6 +77,7 @@ async fn _tests() {
         let mut myvec = alloc::vec::Vec::new();
 
         myvec.push(42);
+        int_debug();
 
         assert!(myvec[0] == 42, "Vector number was not stored properly");
         println!("Tests succeeded");
@@ -120,5 +123,12 @@ async fn _tests() {
         println!("mem size is {}", size);
 
         paging::paging();
+        int_debug();
+    }
+}
+
+fn int_debug() {
+    unsafe {
+        core::arch::asm!("int 42");
     }
 }

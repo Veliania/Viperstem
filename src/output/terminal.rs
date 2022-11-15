@@ -47,7 +47,7 @@ pub static mut GLOB_POS: Pos = Pos {x: 0, y: 0};
 static mut SCREEN_DAT: (u16, usize, usize) = (0, 0, 0);
 static mut SCREEN_COLOR: u32 = 0x00;
 static mut TEXT_COLOR: u32 = 0xFFFFFFFF;
-static mut ADDRESS: Mutex<Option<VirtAddr>> = Mutex::new(None);
+pub static mut ADDRESS: Mutex<Option<VirtAddr>> = Mutex::new(None);
 
 pub fn init() {
 	unsafe {
