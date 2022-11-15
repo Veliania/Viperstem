@@ -12,7 +12,7 @@ pub fn init() {
     /*for i in 0..255 {
         clear_mask(i);
     }*/
-    clear_mask(33);
+    clear_mask(1);
 }
 
 fn clear_mask(irqline: u8) {

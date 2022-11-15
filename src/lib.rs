@@ -27,6 +27,7 @@ use x86_64::{structures::paging::Size4KiB, VirtAddr };
 
 //pub static TERMINAL_REQUEST: LimineTerminalRequest = LimineTerminalRequest::new(0);
 pub static BOOTLOADER_INFO: LimineBootInfoRequest = LimineBootInfoRequest::new(0);
+pub static KERN_POS: LimineKernelAddressRequest = LimineKernelAddressRequest::new(0);
 pub static MMAP: LimineMemmapRequest = LimineMemmapRequest::new(0);
 pub static LVL5: Limine5LevelPagingRequest = Limine5LevelPagingRequest::new(0);
 pub static TIME: LimineBootTimeRequest = LimineBootTimeRequest::new(0);

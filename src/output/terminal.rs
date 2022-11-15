@@ -77,6 +77,7 @@ pub fn init() {
 pub fn init_post_paging(addr: VirtAddr) {
 	unsafe {
 		*ADDRESS.lock() = Some(addr);
+		GLOB_POS = Pos::new(0, 0);
 	}
 }
 

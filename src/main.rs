@@ -107,9 +107,18 @@ async fn _tests() {
                 _ => ()
             }
         }
+
+        let mmap = MMAP.get_response().get().unwrap();
+        let mut size = 0;
+
+        for entry in mmap.memmap() {
+            if (entry.base + entry.len) > size {
+                size = entry.base + entry.len;
+            }
+        }
+
+        println!("mem size is {}", size);
+
+        paging::paging();
     }
-
-    paging::paging();
-
-    println!("paging success");
 }
